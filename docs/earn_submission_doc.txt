@@ -1,0 +1,86 @@
+z-ai-spend-auditor — T3N ADK agent build challenge (Superteam Earn)
+
+Submitted for: "Try out new docs to build a trusted agent with T3N that we can distribute / host" by Terminal 3 Network
+Email: altaranexus@gmail.com
+Tenant DID: did:t3n:17c5904fd6337be3dfde0ddf5f4530e5ff45360f
+Public repo: https://github.com/altaranexus-ship-it/z-ai-spend-auditor
+Continue running it: YES — details in the Handover section below.
+
+
+WHAT IT IS
+
+z-ai-spend-auditor is a TEE-resident AI-spend auditor built on the Terminal 3 ADK. Teams can't honestly answer "what did AI cost us this month?" — this contract turns usage events into an append-only, tenant-private ledger inside the enclave, with per-provider monthly totals, budget + spike alerts, and SHA-256 audit receipts folded into the transaction claims digest (offline-verifiable via the host Merkle receipt).
+
+Base tenant world only: zero outbound HTTP, zero third-party keys, nothing leaves the enclave.
+
+
+WHAT IT DOES
+
+- Append-only usage ledger in tenant-private KV maps (contract-only ACLs, no tenant override)
+- Monthly per-provider aggregates: calls, tokens in/out, micro-USD integer cost (no float drift); month rollover is a key prefix, no setup step to forget
+- Budget + spend-spike alerts exposed as queryable data (not notifications to lose)
+- SHA-256 receipts sealed into the tx claims digest — every record is audit-verifiable offline
+- Providers are data, not code: any AI provider works day one (openai, anthropic, anything)
+
+
+HOW IT USES THE T3N ADK
+
+- Quickstart auth flow: T3nClient + handshake + authenticate, tenantDid read back from the session
+- TenantClient for contract registration and four private KV maps (usage / agg / alerts / budget) with explicit contract-only ACLs on both writer and reader sides
+- Control-plane map-entry-set for the budget seed
+- executeAndDecode for every contract call
+- ERC-8004 agent card hosting via the t3n CLI (register-agent script)
+- Capabilities come straight from the WIT world: kv-store + logging + tenant-context, nothing else
+
+
+VERIFIED LIVE ON TESTNET — 2026-09-15
+
+Contract id 1025 @ version 0.1.3, tenant DID did:t3n:17c5904fd6337be3dfde0ddf5f4530e5ff45360f. End-to-end demo (full log in /evidence/live_demo_2026-09-15T09xxZ.txt in the repo):
+
+  Connected as: did:t3n:17c5904fd6337be3dfde0ddf5f4530e5ff45360f
+  maps ready: usage | agg | alerts | budget (all private, contract-only)
+  budget seeded: $25.00 for 2026-09
+  recorded openai/gpt-4.1-mini            cost=$0.002940  receipt=b5a5cd9b4c93...
+  recorded openai/gpt-4.1                 cost=$0.041250  receipt=5652613e8671...
+  recorded anthropic/claude-sonnet        cost=$0.096300  receipt=0c45fe1dcf0b...
+  recorded openai/text-embedding-3-small  cost=$0.012800  receipt=58a1f63fa9be...
+
+  === MONTH REPORT 2026-09 ===
+    openai      calls=3  tok_in=73920  tok_out=2630  cost=$0.056990
+    anthropic   calls=1  tok_in=11020  tok_out=3980  cost=$0.096300
+    TOTAL $0.153290  calls=4  over_budget=false (0.61% of budget)
+  0 alert(s) recorded.
+
+
+EASE OF MAINTENANCE
+
+- All business logic in one file: src/ledger.rs
+- Pure helpers unit-tested: cargo test 4/4 PASS
+- Idempotent bootstrap; T3N_CONTRACT_ID env skip for re-runs (no accidental re-registration)
+- Agent layer tsc-clean against @terminal3/t3n-sdk@5.2.0
+- One-command operation: agent/scripts/run-finish.sh (setup → demo → agent DID registration)
+- docs/SUBMISSION.md in the repo is the full runbook; docs/BUG_REPORTS.md documents every platform issue encountered, with repro commands
+
+
+HANDOVER — CONTINUE RUNNING: YES
+
+We will continue running the agent on testnet: keep the tenant deployed, honor delegation requests, and maintain the code for 6+ months. If Terminal 3 prefers to host it instead, handover is trivial: the public repo + this doc + docs/SUBMISSION.md form a complete operating manual — contract id, map layout, ACL grants, budget seeding, and the one-command runbook are all documented. No undocumented state exists.
+
+
+BUGS FACED (full write-ups with repro: docs/BUG_REPORTS.md in the repo)
+
+1. Testnet DKG fleet incident: handshake failed 0/3 quotes valid (RTMR3 all-zero on all 3 peers) while the signed trust manifest was frozen — platform-side, healed 2026-09-15 04:23Z (manifest v1789446184). Affects every participant; worth a fleet health probe endpoint.
+2. kv_store::set_claims_digest requires the RAW 32-byte digest; passing the 64-char hex string only fails at tx time ("claims digest must be exactly 32 bytes") — cargo test on pure helpers cannot catch host-boundary type errors.
+3. Contract re-publish allocates a NEW numeric contract_id (0.1.0→1023, 0.1.1→1024, 0.1.2→1025) although docs describe the id as stable.
+4. After any re-publish, map ACLs still point at the OLD contract id → "access denied: TenantContract(...) cannot write map" — writer AND reader grants must both be re-granted.
+5. No RPC reads a contract's numeric id back (listDetailed has no id field) — persist it at register time or burn a version bump to rediscover it.
+6. Obfuscated SDK ships as a single-line esm.js printing ~2.4 MB of noise around real errors; subprocess PIPE capture truncates stderr at exactly 65536 bytes and the error line is lost — always capture stderr to a file.
+7. Docs/SDK mismatches: node emits lowercase "map already exists" (docs show camelCase MapAlreadyExists); maps.delete is async and slow (>5 min) requiring poll-and-retry.
+
+
+LINKS
+
+- Public repo: https://github.com/altaranexus-ship-it/z-ai-spend-auditor
+- Live demo evidence: https://github.com/altaranexus-ship-it/z-ai-spend-auditor/blob/master/evidence/live_demo_2026-09-15T09xxZ.txt
+- Bug reports: https://github.com/altaranexus-ship-it/z-ai-spend-auditor/blob/master/docs/BUG_REPORTS.md
+- Runbook / submission detail: https://github.com/altaranexus-ship-it/z-ai-spend-auditor/blob/master/docs/SUBMISSION.md
