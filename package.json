@@ -1,0 +1,23 @@
+{
+  "name": "z-ai-spend-auditor-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Tenant-side Node agent for the z-ai-spend-auditor TEE contract on Terminal 3 Network (T3N).",
+  "scripts": {
+    "setup": "node scripts/safe-tsx.mjs scripts/session.ts",
+    "demo": "node scripts/safe-tsx.mjs scripts/demo.ts",
+    "register-agent": "node scripts/safe-tsx.mjs scripts/register-agent.ts"
+  },
+  "dependencies": {
+    "@terminal3/t3n-sdk": "^5.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.23.13",
+    "typescript": "^5.5.0"
+  },
+  "remarks": {
+    "TMPDIR": "All scripts go through scripts/safe-tsx.mjs, which re-execs tsx with TMPDIR=/tmp when $TMPDIR/tsx-<uid>/<pid>.pipe would exceed the macOS 104-char socket limit (Paperclip run scratch dirs trigger this)."
+  }
+}

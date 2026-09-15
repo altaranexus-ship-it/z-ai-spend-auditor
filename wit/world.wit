@@ -1,0 +1,61 @@
+/// z-ai-spend-auditor WIT world — AI API spend auditor for T3N tenants.
+///
+/// Imports only the base tenant capabilities:
+///   - tenant-context: tenant DID, cluster timestamp, tx seq for ledger keys
+///   - logging:        debug / info lines
+///   - kv-store:       the append-only usage ledger + monthly aggregates +
+///                     alert state, all under the private z:<tid>: namespace
+///
+/// No `http` import: the contract dials NO third-party API. Its entire
+/// capability set is storage + logs, which is exactly the trust story of a
+/// spend auditor: usage receipts go in, aggregates and alerts come out, and
+/// nothing about the ledger can be silently edited because every entry is
+/// content-addressed into the transaction's claims digest.
+package z:ai-spend-auditor@0.1.0;
+
+world ai-spend-auditor {
+    import host:tenant/tenant-context@1.0.0;
+    import host:interfaces/logging@2.1.0;
+    import host:interfaces/kv-store@2.1.0;
+
+    export contracts;
+}
+
+interface contracts {
+    /// Standard 3-field envelope used by all contracts callable from the node.
+    /// `input`        — JSON-serialized request payload specific to the function.
+    /// `user-profile` — always None for tenant contracts (hardcoded at dispatch).
+    /// `context`      — JSON-serialized DynamicContext (node-minted, trusted).
+    record generic-input {
+        input:        option<list<u8>>,
+        user-profile: option<list<u8>>,
+        context:      option<list<u8>>,
+    }
+
+    /// Append one usage event to the ledger and update monthly aggregates.
+    /// Input  (JSON): { provider, model, tokens_in, tokens_out, cost_micros, ref? }
+    ///   provider/model: strings (e.g. "openai", "gpt-4.1-mini")
+    ///   tokens_in/out:  u64 token counts
+    ///   cost_micros:    u64 cost in micro-USD (1e-6 USD units)
+    ///   ref:            optional free-text reference (job id, ticket, ...)
+    /// Output (JSON): { entry_id, seq, month, receipt_sha256, month_totals }
+    record-usage: func(req: generic-input) -> result<list<u8>, string>;
+
+    /// Query monthly totals, optionally filtered by provider.
+    /// Input  (JSON): { month: "2026-09", provider?: "openai" }
+    /// Output (JSON): { month, per_provider: [{provider, calls, tokens_in,
+    ///                  tokens_out, cost_micros}], total_cost_micros,
+    ///                  budget_micros, over_budget, pct_of_budget }
+    month-report: func(req: generic-input) -> result<list<u8>, string>;
+
+    /// Set or clear the monthly budget. Budget state is per-month.
+    /// Input  (JSON): { month: "2026-09", budget_micros: 25000000 }
+    ///   (budget_micros = 0 clears the budget)
+    /// Output (JSON): { month, budget_micros, set: true }
+    set-budget: func(req: generic-input) -> result<list<u8>, string>;
+
+    /// List alert entries raised for a month (budget crossings + anomalies).
+    /// Input  (JSON): { month: "2026-09" }
+    /// Output (JSON): { month, alerts: [{ seq, ts, kind, detail }] }
+    list-alerts: func(req: generic-input) -> result<list<u8>, string>;
+}

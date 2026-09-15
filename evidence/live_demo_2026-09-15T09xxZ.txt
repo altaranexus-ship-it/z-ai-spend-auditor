@@ -1,0 +1,18 @@
+Connected as: did:t3n:17c5904fd6337be3dfde0ddf5f4530e5ff45360f
+TenantClient ready.
+setup skipped, using contract id 1025 version 0.1.3
+maps ready: usage | agg | alerts | budget (all private, contract-only)
+budget seeded: $25.00 for 2026-09
+recorded openai/gpt-4.1-mini cost=$0.002940 → month_total=$0.002940 receipt=b5a5cd9b4c93…
+recorded openai/gpt-4.1 cost=$0.041250 → month_total=$0.044190 receipt=5652613e8671…
+recorded anthropic/claude-sonnet cost=$0.096300 → month_total=$0.140490 receipt=0c45fe1dcf0b…
+recorded openai/text-embedding-3-small cost=$0.012800 → month_total=$0.153290 receipt=58a1f63fa9be…
+
+=== MONTH REPORT 2026-09 ===
+  openai     calls=  3 tok_in=  73920 tok_out=   2630 cost=$0.056990
+  anthropic  calls=  1 tok_in=  11020 tok_out=   3980 cost=$0.096300
+  TOTAL $0.153290 calls=4 over_budget=false (0.61% of budget)
+
+=== ALERTS 2026-09 ===
+
+0 alert(s) recorded. Demo complete.

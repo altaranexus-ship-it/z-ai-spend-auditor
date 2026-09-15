@@ -1,0 +1,3 @@
+Connected as: did:t3n:17c5904fd6337be3dfde0ddf5f4530e5ff45360f
+contract names: ["z:17c5904fd6337be3dfde0ddf5f4530e5ff45360f:ai-spend-auditor"]
+contracts detailed (raw wire): {"contracts":[{"name":"z:17c5904fd6337be3dfde0ddf5f4530e5ff45360f:ai-spend-auditor","short_name":"ai-spend-auditor","version":"0.1.0","status":"active","descriptor":null}],"next":null}
