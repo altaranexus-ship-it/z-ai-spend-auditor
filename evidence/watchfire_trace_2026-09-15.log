@@ -1,0 +1,4 @@
+2026-09-15T04:21:58.755345Z tick 4 (hourly forced handshake) exit=1
+2026-09-15T04:21:58.756917Z SIG[DKG attestation]:                                                                       ^  Error: DKG attestation verification f
+2026-09-15T04:34:34.939535Z tick 5 (manifest changed) exit=1
+2026-09-15T04:34:46.297279Z tick 6 (manifest changed) exit=1
