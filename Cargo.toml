@@ -1,6 +1,6 @@
 [package]
 name = "z-ai-spend-auditor"
-version = "0.1.0"
+version = "0.1.5"
 edition = "2021"
 description = "TEE spend auditor for AI API usage: append-only usage ledger, monthly aggregation, budget alerts, SHA-256 audit receipts — tenant-base world only (kv-store, logging, tenant-context; zero outbound HTTP)."
 license = "MIT"

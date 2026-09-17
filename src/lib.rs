@@ -1,4 +1,4 @@
-//! z-ai-spend-auditor v0.1.0 — AI API spend auditor for T3N tenants.
+//! z-ai-spend-auditor v0.1.5 — AI API spend auditor for T3N tenants.
 //!
 //! Four node-callable operations on the `contracts` interface:
 //!
@@ -32,7 +32,7 @@
 
 extern crate alloc;
 
-pub const CONTRACT_VERSION: &str = "0.1.0";
+pub const CONTRACT_VERSION: &str = "0.1.5";
 
 wit_bindgen::generate!({
     world: "ai-spend-auditor",

@@ -11,7 +11,7 @@
 /// spend auditor: usage receipts go in, aggregates and alerts come out, and
 /// nothing about the ledger can be silently edited because every entry is
 /// content-addressed into the transaction's claims digest.
-package z:ai-spend-auditor@0.1.0;
+package z:ai-spend-auditor@0.1.5;
 
 world ai-spend-auditor {
     import host:tenant/tenant-context@1.0.0;

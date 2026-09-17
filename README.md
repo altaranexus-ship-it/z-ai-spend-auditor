@@ -129,3 +129,23 @@ alerts triggered by the seeded $25 budget.
 - Tips (KV maps, seeding secrets, capability-from-WIT, common errors)
 
 Built for the T3N ADK agent-build challenge (Sept 2026).
+
+## Re-publish / re-grant runbook
+
+The contract register is **monotonic per tail**: publishing a bumped version
+mints a **new numeric contract id**, and you cannot re-take a consumed version
+(`version X is not higher than current version X`). Plan every re-publish
+around three consequences:
+
+1. **Re-point BOTH grant sides.** Maps created earlier still point at the old
+   id — re-assert `writers` AND `readers` of all four audit maps
+   (`usage`, `agg`, `alerts`, `budget`) at the new id:
+   `cd agent && GRANT_CONTRACT_ID=<new-id> node scripts/safe-tsx.mjs scripts/verify_grants.ts`
+   (re-points both sides idempotently and prints the returned ACL config;
+   `grant_maps.ts` / `grant_readers.ts` do one side each.)
+2. **Map deletions are async** — after `maps.delete`, a same-tail create can
+   briefly 409/404 until the deletion settles. Wait-and-retry, don't race it.
+3. **Keep repo labels in lock-step with the published version** (Cargo.toml,
+   `CONTRACT_VERSION` in `src/lib.rs`, `wit/world.wit` package version,
+   `agent/package.json`). Drift between repo labels and the live registry is
+   what this repo hit in Sept 2026 — labels said 0.1.0 while 0.1.5 was live.
