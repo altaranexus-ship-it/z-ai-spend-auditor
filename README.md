@@ -12,6 +12,16 @@ API: its entire capability surface is `kv-store` + `logging` +
 `tenant-context` (the base tenant world), which is exactly the right trust
 envelope for an auditor.
 
+## Status
+
+**Current:** version labels 0.1.5 (repo synced 2026-09-17). The published
+contract 0.1.5 (registry id 1029) is **pending live-verify** — awaiting owner
+credit top-up, tracked in [#3](https://github.com/altaranexus-ship-it/z-ai-spend-auditor/issues/3).
+The 0.1.3 contract (id 1025) passed its end-to-end testnet demo on 2026-09-15
+(`evidence/`). Full submission status table:
+[docs/SUBMISSION_STATUS.md](docs/SUBMISSION_STATUS.md). Bugs and planned work
+live in the [issue tracker](https://github.com/altaranexus-ship-it/z-ai-spend-auditor/issues).
+
 ## What it does
 
 | Function | Input (JSON) | Output (JSON) |
