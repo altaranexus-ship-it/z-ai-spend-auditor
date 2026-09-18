@@ -3,9 +3,9 @@
 //! Four node-callable operations on the `contracts` interface:
 //!
 //! - `record-usage`:  append one usage event to the private per-tenant
-//!                    ledger and update the month's aggregates.
+//!   ledger and update the month's aggregates.
 //! - `month-report`:  totals for a month, optionally filtered by provider,
-//!                    with budget status.
+//!   with budget status.
 //! - `set-budget`:    set/clear the monthly budget (micro-USD).
 //! - `list-alerts`:   alert entries (budget crossings + anomalies).
 //!
